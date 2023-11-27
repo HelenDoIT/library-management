@@ -2,6 +2,9 @@ package com.mylibrary.dao.impl;
 
 import com.mylibrary.dao.IBookInfoDao;
 import com.mylibrary.domain.BookInfo;
+import com.mylibrary.handler.impl.BeanHandler;
+import com.mylibrary.handler.impl.BeanListHandler;
+import com.mylibrary.util.JdbcTemplate;
 import com.mylibrary.util.JdbcUtil;
 
 import java.sql.Connection;
@@ -18,35 +21,12 @@ import java.util.List;
 public class BookInfoDaoImpl implements IBookInfoDao {
 
     @Override
-    public int save(BookInfo bookInfo) throws SQLException {
+    public int save(BookInfo bookInfo) {
         String sql = "INSERT INTO book_info (name,author,inventory) VALUES (?,?,?)";
-        Connection connection = null;
-        PreparedStatement ps = null;
-        try {
-            connection = JdbcUtil.getConnection();
-            ps = connection.prepareStatement(sql);
-            ps.setString(1,bookInfo.getName());
-            ps.setString(2,bookInfo.getAuthor());
-            ps.setInt(3,bookInfo.getInventory());
-            return ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }finally {
-                if (ps != null) {
-                    ps.close();
-                }
-                if(connection != null){
-                    connection.close();
-                }
-        }
-
+        return JdbcTemplate.update(sql,bookInfo.getName(),bookInfo.getAuthor(),bookInfo.getInventory());
     }
 
-    @Override
-    public int update(BookInfo bookInfo) throws SQLException{
-        return 0;
-    }
+
 
     @Override
     public int delete(Long id) throws SQLException{
@@ -59,41 +39,21 @@ public class BookInfoDaoImpl implements IBookInfoDao {
     }
 
     @Override
-    public BookInfo queryByNameAndAuthor(String name, String author) throws SQLException {
-        String sql = "SELECT book_id,`name`,author,inventory FROM book_info WHERE name=? and author = ?;";
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            connection = JdbcUtil.getConnection();
-            ps = connection.prepareStatement(sql);
-            ps.setString(1,name);
-            ps.setString(2,author);
-            rs = ps.executeQuery();
-            while (rs.next()){
-                long bookId = rs.getLong("book_id");
-                String name1 = rs.getString("name");
-                String author1 = rs.getString("author");
-                Integer inventory = rs.getInt("inventory");
-                BookInfo bookInfo = new BookInfo(bookId,name1,author1,inventory);
-                return bookInfo;
-            }
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }finally {
-            if (ps != null) {
-                ps.close();
-            }
-            if(connection != null){
-                connection.close();
-            }
-        }
+    public BookInfo queryByNameAndAuthor(String name, String author){
+        String sql = "SELECT book_id as bookId,`name`,author,inventory FROM book_info WHERE name=? and author = ?;";
+        BookInfo bookInfo = JdbcTemplate.queryList(sql, new BeanHandler<BookInfo>(BookInfo.class), name, author);
+        return bookInfo;
     }
 
     @Override
-    public List<BookInfo> listAll() throws SQLException{
-        return null;
+    public List<BookInfo> listAll(){
+        String sql = "SELECT book_id as bookId,`name`,author,inventory FROM book_info";
+         return  JdbcTemplate.queryList(sql, new BeanListHandler<BookInfo>(BookInfo.class));
+    }
+
+    @Override
+    public int updateInventory(Long bookId, int origInventory, int addInventory) {
+        String sql = "UPDATE book_info SET inventory = inventory + ? where book_id = ? and inventory = ?";
+        return JdbcTemplate.update(sql,addInventory,bookId,origInventory);
     }
 }

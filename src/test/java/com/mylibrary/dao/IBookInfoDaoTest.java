@@ -5,13 +5,13 @@ import com.mylibrary.domain.BookInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -21,12 +21,13 @@ import java.util.Objects;
  */
 class IBookInfoDaoTest {
 
+    @Mock
+    private BookInfoDaoImpl bookInfoDaoMock;
     @Spy
     private BookInfoDaoImpl bookInfoDao;
-    @Spy
-    private PreparedStatement ps;
-    @Spy
-    private Connection connection;
+
+    @Captor
+    private ArgumentCaptor<BookInfo> argumentCaptor;
 
 
     @BeforeEach
@@ -35,6 +36,10 @@ class IBookInfoDaoTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     *  This will affect the database
+     * @throws Exception
+     */
     @org.junit.jupiter.api.Test
     void save() throws Exception{
         //Add book
@@ -42,16 +47,18 @@ class IBookInfoDaoTest {
         Assertions.assertEquals(1,bookInfoDao.save(bookInfo));
         Mockito.verify(bookInfoDao,Mockito.times(1)).save(bookInfo);
 
+        Mockito.when(bookInfoDaoMock.save(argumentCaptor.capture())).thenReturn(1);
+        Assertions.assertEquals(1, bookInfoDaoMock.save(argumentCaptor.capture()));
+        //Mockito.verify(bookInfoDao).save(argumentCaptor.capture());
+
         //mock exception
-        Mockito.when(bookInfoDao.save(bookInfo)).thenThrow(new SQLException("This is SQLException"));
+        Mockito.when(bookInfoDaoMock.save(argumentCaptor.capture())).thenThrow(new SQLException("This is SQLException"));
         try {
-            bookInfoDao.save(bookInfo);
+            bookInfoDaoMock.save(argumentCaptor.capture());
             Assertions.fail();
         } catch (Exception e) {
             Assertions.assertEquals("This is SQLException",e.getMessage());
         }
-//        Mockito.verify(ps,Mockito.times(0)).close();
-//        Mockito.verify(connection,Mockito.times(0)).close();
     }
 
     @Test
@@ -74,14 +81,32 @@ class IBookInfoDaoTest {
         try {
             bookInfoDao.queryByNameAndAuthor(name,author);
             Assertions.fail();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Assertions.assertEquals("This is SQLException",e.getMessage());
         }
 
     }
 
     @org.junit.jupiter.api.Test
-    void update() {
+    void updateInventory() {
+        //Assertions.assertEquals(1, bookInfoDao.updateInventory(2L,11,3));
+
+        Mockito.when(bookInfoDao.updateInventory(ArgumentMatchers.anyLong(),ArgumentMatchers.anyInt(),ArgumentMatchers.anyInt()))
+                .thenReturn(1);
+        Assertions.assertEquals(1,bookInfoDao.updateInventory(ArgumentMatchers.anyLong(),ArgumentMatchers.anyInt(),ArgumentMatchers.anyInt()));
+
+        Mockito.when(bookInfoDao.updateInventory(1L,5,3))
+                .thenReturn(8);
+        Assertions.assertEquals(8,bookInfoDao.updateInventory(1L,5,3));
+
+        //mock exception
+        Mockito.when(bookInfoDao.updateInventory(1L,5,3)).thenThrow(new SQLException("This is an update SQLException"));
+        try {
+            bookInfoDao.updateInventory(1L,5,3);
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertEquals(e.getMessage(),"This is an update SQLException");
+        }
     }
 
     @org.junit.jupiter.api.Test
@@ -94,5 +119,15 @@ class IBookInfoDaoTest {
 
     @org.junit.jupiter.api.Test
     void listAll() {
+        List<BookInfo> bookInfos = new ArrayList<>();
+        bookInfos.add(new BookInfo(1L,"Clean Code","Robert C. Martin",5));
+        Mockito.when(bookInfoDaoMock.listAll()).thenReturn(bookInfos);
+        List<BookInfo> infos = bookInfoDaoMock.listAll();
+        Assertions.assertNotNull(infos);
+        Assertions.assertEquals(1,infos.size());
+        Assertions.assertEquals("Clean Code",infos.get(0).getName());
+
+        //call real method
+        Assertions.assertNotNull(bookInfoDao.listAll());
     }
 }

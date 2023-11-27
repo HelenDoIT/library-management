@@ -12,15 +12,15 @@ import java.util.List;
  */
 public interface IBookInfoDao {
 
-    public int save(BookInfo bookInfo) throws SQLException;
-
-    public int update(BookInfo bookInfo) throws SQLException;
+    public int save(BookInfo bookInfo);
 
     public int delete(Long id) throws SQLException;
 
     public BookInfo queryByKey(Long id) throws SQLException;
 
-    public BookInfo queryByNameAndAuthor(String name,String author) throws SQLException;
+    public BookInfo queryByNameAndAuthor(String name,String author);
 
-    public List<BookInfo> listAll() throws SQLException;
+    public List<BookInfo> listAll();
+
+    public int updateInventory(Long bookId, int origInventory, int addInventory);
 }
