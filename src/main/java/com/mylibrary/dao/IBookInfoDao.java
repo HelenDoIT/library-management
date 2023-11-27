@@ -14,9 +14,9 @@ public interface IBookInfoDao {
 
     public int save(BookInfo bookInfo);
 
-    public int delete(Long id) throws SQLException;
+    public int logicDelete(Long id);
 
-    public BookInfo queryByKey(Long id) throws SQLException;
+    public BookInfo queryByKey(Long id);
 
     public BookInfo queryByNameAndAuthor(String name,String author);
 

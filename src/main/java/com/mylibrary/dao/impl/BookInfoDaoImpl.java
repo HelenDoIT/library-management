@@ -29,31 +29,33 @@ public class BookInfoDaoImpl implements IBookInfoDao {
 
 
     @Override
-    public int delete(Long id) throws SQLException{
-        return 0;
+    public int logicDelete(Long id){
+        String sql = "UPDATE book_info SET dr =1 where book_id = ? and dr = 0";
+        return JdbcTemplate.update(sql,id);
     }
 
     @Override
-    public BookInfo queryByKey(Long id) throws SQLException{
-        return null;
+    public BookInfo queryByKey(Long id) {
+        String sql = "SELECT book_id as bookId,`name`,author,inventory,dr FROM book_info WHERE book_id = ? and dr=0";
+        return JdbcTemplate.queryList(sql,new BeanHandler<>(BookInfo.class),id);
     }
 
     @Override
     public BookInfo queryByNameAndAuthor(String name, String author){
-        String sql = "SELECT book_id as bookId,`name`,author,inventory FROM book_info WHERE name=? and author = ?;";
+        String sql = "SELECT book_id as bookId,`name`,author,inventory,dr FROM book_info WHERE name=? and author = ? and dr=0;";
         BookInfo bookInfo = JdbcTemplate.queryList(sql, new BeanHandler<BookInfo>(BookInfo.class), name, author);
         return bookInfo;
     }
 
     @Override
     public List<BookInfo> listAll(){
-        String sql = "SELECT book_id as bookId,`name`,author,inventory FROM book_info";
+        String sql = "SELECT book_id as bookId,`name`,author,inventory,dr FROM book_info where dr=0";
          return  JdbcTemplate.queryList(sql, new BeanListHandler<BookInfo>(BookInfo.class));
     }
 
     @Override
     public int updateInventory(Long bookId, int origInventory, int addInventory) {
-        String sql = "UPDATE book_info SET inventory = inventory + ? where book_id = ? and inventory = ?";
+        String sql = "UPDATE book_info SET inventory = inventory + ? where book_id = ? and inventory = ? and dr=0";
         return JdbcTemplate.update(sql,addInventory,bookId,origInventory);
     }
 }

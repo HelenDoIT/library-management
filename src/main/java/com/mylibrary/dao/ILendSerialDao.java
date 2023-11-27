@@ -14,9 +14,9 @@ public interface ILendSerialDao {
 
     public int save(LendSerial serial);
 
-    public int update(LendSerial serial);
-
-    public LendSerial queryOne(LendSerial serial);
+    public int updateLendStatus(Long serialNo,int lendStatus);
 
     public List<LendSerial> queryByUserId(Long userId);
+
+    public List<LendSerial> queryByBookIdAndStatus(Long bookId,int lendStatus);
 }

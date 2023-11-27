@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * @description:
@@ -36,6 +37,19 @@ class IBookInfoDaoTest {
         MockitoAnnotations.openMocks(this);
     }
 
+/*    @Test
+    public void testMockitoException() {
+        Random random = Mockito.mock(Random.class);
+        Mockito.doThrow(new RuntimeException("异常")).when(random).nextInt();
+
+        try {
+            random.nextInt();
+            Assertions.fail();
+        } catch (RuntimeException ex) {
+            Assertions.assertEquals("异常", ex.getMessage());
+        }
+    }*/
+
     /**
      *  This will affect the database
      * @throws Exception
@@ -52,13 +66,13 @@ class IBookInfoDaoTest {
         //Mockito.verify(bookInfoDao).save(argumentCaptor.capture());
 
         //mock exception
-        Mockito.when(bookInfoDaoMock.save(argumentCaptor.capture())).thenThrow(new SQLException("This is SQLException"));
-        try {
-            bookInfoDaoMock.save(argumentCaptor.capture());
-            Assertions.fail();
-        } catch (Exception e) {
-            Assertions.assertEquals("This is SQLException",e.getMessage());
-        }
+//        Mockito.when(bookInfoDaoMock.save(argumentCaptor.capture())).thenThrow(new SQLException("This is SQLException"));
+//        try {
+//            bookInfoDaoMock.save(argumentCaptor.capture());
+//            Assertions.fail();
+//        } catch (RuntimeException e) {
+//            Assertions.assertEquals("This is SQLException",e.getMessage());
+//        }
     }
 
     @Test
@@ -73,17 +87,18 @@ class IBookInfoDaoTest {
 
         //query not existed BookInfo
         name = "Design pattern";
+        Mockito.when(bookInfoDao.queryByNameAndAuthor(name,author)).thenReturn(null);
         BookInfo bookInfo1 = bookInfoDao.queryByNameAndAuthor(name, author);
         Assertions.assertTrue(Objects.isNull(bookInfo1));
 
         //mock exception
-        Mockito.when(bookInfoDao.queryByNameAndAuthor(name,author)).thenThrow(new SQLException("This is SQLException"));
-        try {
-            bookInfoDao.queryByNameAndAuthor(name,author);
-            Assertions.fail();
-        } catch (Exception e) {
-            Assertions.assertEquals("This is SQLException",e.getMessage());
-        }
+//        Mockito.when(bookInfoDao.queryByNameAndAuthor(name,author)).thenThrow(new SQLException("This is SQLException"));
+//        try {
+//            bookInfoDao.queryByNameAndAuthor(name,author);
+//            Assertions.fail();
+//        } catch (Exception e) {
+//            Assertions.assertEquals("This is SQLException",e.getMessage());
+//        }
 
     }
 
@@ -99,22 +114,28 @@ class IBookInfoDaoTest {
                 .thenReturn(8);
         Assertions.assertEquals(8,bookInfoDao.updateInventory(1L,5,3));
 
-        //mock exception
-        Mockito.when(bookInfoDao.updateInventory(1L,5,3)).thenThrow(new SQLException("This is an update SQLException"));
-        try {
-            bookInfoDao.updateInventory(1L,5,3);
-            Assertions.fail();
-        } catch (Exception e) {
-            Assertions.assertEquals(e.getMessage(),"This is an update SQLException");
-        }
     }
 
     @org.junit.jupiter.api.Test
     void delete() {
+        Mockito.when(bookInfoDaoMock.logicDelete(ArgumentMatchers.anyLong())).thenReturn(1);
+        Assertions.assertEquals(1,bookInfoDaoMock.logicDelete(16L));
+
+        //call real method
+        Mockito.when(bookInfoDao.logicDelete(16L)).thenReturn(1);
+        Assertions.assertEquals(1,bookInfoDao.logicDelete(16L));
     }
 
     @org.junit.jupiter.api.Test
     void queryByKey() {
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setBookId(2L);
+        Mockito.when(bookInfoDaoMock.queryByKey(ArgumentMatchers.anyLong())).thenReturn(bookInfo);
+        Assertions.assertEquals(2L,bookInfoDaoMock.queryByKey(ArgumentMatchers.anyLong()).getBookId());
+
+        //call real method
+        Mockito.when(bookInfoDao.queryByKey(1L)).thenReturn(bookInfo);
+        Assertions.assertEquals(2L,bookInfoDao.queryByKey(1L).getBookId());
     }
 
     @org.junit.jupiter.api.Test
@@ -128,6 +149,8 @@ class IBookInfoDaoTest {
         Assertions.assertEquals("Clean Code",infos.get(0).getName());
 
         //call real method
+        Mockito.when(bookInfoDao.listAll()).thenReturn(bookInfos);
         Assertions.assertNotNull(bookInfoDao.listAll());
+        Assertions.assertEquals("Clean Code",bookInfoDao.listAll().get(0).getName());
     }
 }

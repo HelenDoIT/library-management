@@ -20,7 +20,12 @@ public interface IBookInfoService {
      */
     public int add(BookInfo bookInfo) throws SQLException;
 
-    public int delete(Long  id);
+    /**
+     * If books that are currently being borrowed by users, they  cannot be deleted
+     * @param id
+     * @return
+     */
+    public int delete(Long  id) throws Exception;
 
     public List<BookInfo> listAll();
 }

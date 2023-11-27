@@ -1,6 +1,7 @@
 package com.mylibrary.domain;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -11,47 +12,49 @@ import java.util.Date;
 public class LendSerial implements Serializable {
 
     private static final long serialVersionUID = -4113615840320231245L;
-    private Long lendSerial;
-    private String userId;
-    private String bookId;
+    private Long serialNo;
+    private Long userId;
+    private Long bookId;
     private int lendNum;
-    private Date lendDate;
-    private Date returnDate;
+    private int lendStatus;
+    private LocalDateTime lendDate;
+    private LocalDateTime returnDate;
 
     public LendSerial(){
 
     }
 
-    public LendSerial(Long lendSerial, String userId, String bookId, int lendNum, Date lendDate, Date returnDate) {
-        this.lendSerial = lendSerial;
+    public LendSerial(Long serialNo, Long userId, Long bookId, int lendNum, int lendStatus, LocalDateTime lendDate, LocalDateTime returnDate) {
+        this.serialNo = serialNo;
         this.userId = userId;
         this.bookId = bookId;
         this.lendNum = lendNum;
+        this.lendStatus = lendStatus;
         this.lendDate = lendDate;
         this.returnDate = returnDate;
     }
 
-    public Long getLendSerial() {
-        return lendSerial;
+    public Long getSerialNo() {
+        return serialNo;
     }
 
-    public void setLendSerial(Long lendSerial) {
-        this.lendSerial = lendSerial;
+    public void setSerialNo(Long serialNo) {
+        this.serialNo = serialNo;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public String getBookId() {
+    public Long getBookId() {
         return bookId;
     }
 
-    public void setBookId(String bookId) {
+    public void setBookId(Long bookId) {
         this.bookId = bookId;
     }
 
@@ -63,19 +66,27 @@ public class LendSerial implements Serializable {
         this.lendNum = lendNum;
     }
 
-    public Date getLendDate() {
+    public int getLendStatus() {
+        return lendStatus;
+    }
+
+    public void setLendStatus(int lendStatus) {
+        this.lendStatus = lendStatus;
+    }
+
+    public LocalDateTime getLendDate() {
         return lendDate;
     }
 
-    public void setLendDate(Date lendDate) {
+    public void setLendDate(LocalDateTime lendDate) {
         this.lendDate = lendDate;
     }
 
-    public Date getReturnDate() {
+    public LocalDateTime getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Date returnDate) {
+    public void setReturnDate(LocalDateTime returnDate) {
         this.returnDate = returnDate;
     }
 }

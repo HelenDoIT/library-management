@@ -15,6 +15,7 @@ public class BookInfo implements Serializable {
     private String name;
     private String author;
     private int inventory;
+    private int dr;
 
     public BookInfo(){
 
@@ -57,5 +58,13 @@ public class BookInfo implements Serializable {
 
     public void setInventory(int inventory) {
         this.inventory = inventory;
+    }
+
+    public int getDr() {
+        return dr;
+    }
+
+    public void setDr(int dr) {
+        this.dr = dr;
     }
 }
