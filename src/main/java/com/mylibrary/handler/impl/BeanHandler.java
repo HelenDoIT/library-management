@@ -29,6 +29,8 @@ public class BeanHandler<T> implements IResultSetHandler<T> {
                 Object value = rs.getObject(name);
                 pd.getWriteMethod().invoke(obj, value);
             }
+        }else{
+            return null;
         }
         return obj;
     }

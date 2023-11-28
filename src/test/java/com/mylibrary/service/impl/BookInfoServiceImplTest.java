@@ -94,4 +94,14 @@ class BookInfoServiceImplTest {
         Mockito.when(bookInfoDao.listAll()).thenReturn(null);
         assertDoesNotThrow(() -> bookInfoService.listAll());
     }
+
+    @Test
+    void queryByName() {
+        BookInfo bookInfo = new BookInfo(1L, "ABC", "AAA", 5);
+        Mockito.when(bookInfoDao.queryByName(ArgumentMatchers.anyString())).thenReturn(bookInfo);
+        Assertions.assertEquals("ABC",bookInfoService.queryByName("ABC").getName());
+
+    }
+
+
 }

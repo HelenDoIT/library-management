@@ -5,6 +5,8 @@ import com.mylibrary.domain.LendSerial;
 import com.mylibrary.handler.impl.BeanListHandler;
 import com.mylibrary.util.JdbcTemplate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -25,23 +27,23 @@ public class LendSerialDaoImpl implements ILendSerialDao {
     @Override
     public int updateLendStatus(Long serialNo,int lendStatus) {
         String sql = "UPDATE lend_serial SET lend_status = ?,return_date = ? WHERE serial_no = ? and lend_status = 0";
-        Date returnDate = new Date();
+        LocalDateTime returnDate = LocalDateTime.now();
         return JdbcTemplate.update(sql,lendStatus,returnDate,serialNo);
     }
 
 
     @Override
     public List<LendSerial> queryByUserId(Long userId) {
-        String sql = "SELECT serial_no as serialNo,user_id as userId,book_id as bookId,\n" +
-                "lend_num as lendNum,lend_status as lendStatus,lend_date as lendDate,return_date as returnDate\n" +
-                " FROM lend_serial WHERE user_id = ? ORDER BY lend_status,lend_date LIMIT 100";
+        String sql = "SELECT serial_no as serialNo,user_id as userId,book_id as bookId,lend_num as lendNum,lend_status as lendStatus," +
+                "lend_date as lendDate,return_date as returnDate FROM lend_serial " +
+                "WHERE user_id = ? ORDER BY lend_status,lend_date LIMIT 100";
         return JdbcTemplate.queryList(sql,new BeanListHandler<>(LendSerial.class),userId);
     }
 
     @Override
     public List<LendSerial> queryByBookIdAndStatus(Long bookId,int lendStatus) {
-        String sql = "SELECT serial_no as serialNo,user_id as userId,book_id as bookId,\n" +
-                "lend_num as lendNum,lend_status as lendStatus,lend_date as lendDate,return_date as returnDate\n" +
+        String sql = "SELECT serial_no as serialNo,user_id as userId,book_id as bookId," +
+                "lend_num as lendNum,lend_status as lendStatus,lend_date as lendDate,return_date as returnDate" +
                 " FROM lend_serial WHERE book_id = ? and lend_status = ?";
         return JdbcTemplate.queryList(sql,new BeanListHandler<>(LendSerial.class),bookId,lendStatus);
     }

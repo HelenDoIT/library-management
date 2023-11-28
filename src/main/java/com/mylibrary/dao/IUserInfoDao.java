@@ -16,4 +16,6 @@ public interface IUserInfoDao {
 
     public UserInfo queryByKey(Long id);
 
+    public UserInfo queryByName(String username);
+
 }

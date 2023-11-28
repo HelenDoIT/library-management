@@ -6,6 +6,7 @@ import com.mylibrary.dao.impl.BookInfoDaoImpl;
 import com.mylibrary.dao.impl.LendSerialDaoImpl;
 import com.mylibrary.domain.BookInfo;
 import com.mylibrary.domain.LendSerial;
+import com.mylibrary.dto.BookInfoDto;
 import com.mylibrary.service.IBookInfoService;
 
 import java.util.List;
@@ -45,18 +46,36 @@ public class BookInfoServiceImpl implements IBookInfoService {
      * @return
      */
     @Override
-    public int delete(Long id) throws Exception {
+    public BookInfoDto delete(Long id) {
+        BookInfoDto bookInfoDto = new BookInfoDto();
         List<LendSerial> lendSerialList = lendSerialDao.queryByBookIdAndStatus(id, 0);
         if(null == lendSerialList || lendSerialList.size() == 0){
-            return bookInfoDao.logicDelete(id);
+            bookInfoDao.logicDelete(id);
+            bookInfoDto.setCode(0);
         }else{
-            //todo throw BusinessException
-            throw new Exception("You can not delete this book since it's in lending!");
+            bookInfoDto.setCode(-1);
+            bookInfoDto.setErrorMsg("You can not delete this book since it's in lending!");
         }
+        return bookInfoDto;
     }
 
     @Override
     public List<BookInfo> listAll() {
-        return bookInfoDao.listAll();
+        try {
+            return bookInfoDao.listAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public BookInfo queryByName(String bookname) {
+        try {
+            return bookInfoDao.queryByName(bookname);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

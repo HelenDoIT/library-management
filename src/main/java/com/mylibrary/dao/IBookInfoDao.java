@@ -23,4 +23,6 @@ public interface IBookInfoDao {
     public List<BookInfo> listAll();
 
     public int updateInventory(Long bookId, int origInventory, int addInventory);
+
+    public BookInfo queryByName(String bookname);
 }

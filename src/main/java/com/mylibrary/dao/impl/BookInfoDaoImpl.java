@@ -58,4 +58,11 @@ public class BookInfoDaoImpl implements IBookInfoDao {
         String sql = "UPDATE book_info SET inventory = inventory + ? where book_id = ? and inventory = ? and dr=0";
         return JdbcTemplate.update(sql,addInventory,bookId,origInventory);
     }
+
+    @Override
+    public BookInfo queryByName(String bookname) {
+        String sql = "SELECT book_id as bookId,`name`,author,inventory,dr FROM book_info WHERE name=? and dr=0;";
+        BookInfo bookInfo = JdbcTemplate.queryList(sql, new BeanHandler<BookInfo>(BookInfo.class), bookname);
+        return bookInfo;
+    }
 }
