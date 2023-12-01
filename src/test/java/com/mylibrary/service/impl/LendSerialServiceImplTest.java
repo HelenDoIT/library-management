@@ -1,9 +1,9 @@
 package com.mylibrary.service.impl;
 
-import com.mylibrary.dao.ILendSerialDao;
+import com.mylibrary.dao.impl.BookInfoDaoImpl;
 import com.mylibrary.dao.impl.LendSerialDaoImpl;
+import com.mylibrary.domain.BookInfo;
 import com.mylibrary.domain.LendSerial;
-import com.mylibrary.service.ILendSerialService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,10 @@ import org.mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.*;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 /**
  * @description:
@@ -23,6 +26,8 @@ class LendSerialServiceImplTest {
 
     @Mock
     private LendSerialDaoImpl lendSerialDao;
+    @Mock
+    private BookInfoDaoImpl bookInfoDao;
     @InjectMocks
     private LendSerialServiceImpl lendSerialService;
     @Captor
@@ -36,10 +41,27 @@ class LendSerialServiceImplTest {
     @Test
     void recodeLending() {
         LendSerial lendSerial = new LendSerial(null,1L,22L,1,0,null,null);
-        Mockito.when(lendSerialDao.save(argumentCaptor.capture()));
-        lendSerialService.recodeLending(lendSerial);
+        // 打桩
+        Mockito.when(bookInfoDao.queryByKey(22L))
+                .thenReturn(new BookInfo(22L,"AAA","abc",5));
+        Mockito.when(bookInfoDao.updateInventory(ArgumentMatchers.anyLong(),ArgumentMatchers.anyInt(),ArgumentMatchers.anyInt()))
+                .thenReturn(1);
+        lendSerialService.recodeLending(lendSerial);//执行要测试的方法
+        verify(bookInfoDao,times(1)).updateInventory(22L,5,-1);//验证方法内逻辑执行次数
+        verify(lendSerialDao).save(argumentCaptor.capture());//参数捕获
         Assertions.assertEquals(1L,argumentCaptor.getValue().getUserId());
+    }
 
+    @Test
+    void recodeLendingFail() {
+        LendSerial lendSerial = new LendSerial(null,1L,22L,1,0,null,null);
+        // 打桩
+        Mockito.when(bookInfoDao.queryByKey(22L))
+                .thenReturn(null);
+        int i = lendSerialService.recodeLending(lendSerial);//执行要测试的方法
+        verify(bookInfoDao,times(0)).updateInventory(22L,5,-1);//验证方法内逻辑执行次数
+        verify(lendSerialDao,times(0)).save(argumentCaptor.capture());//验证方法内逻辑执行次数
+        Assertions.assertEquals(0,i);
     }
 
     @Test

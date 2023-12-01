@@ -29,7 +29,7 @@ public class LendSerialServiceImpl implements ILendSerialService {
         if(Objects.nonNull(bookInfo) && bookInfo.getInventory() > 0){
             int i = bookInfoDao.updateInventory(lendSerial.getBookId(), bookInfo.getInventory(), -1);
             Assertions.assertEquals(i,1);
-            lendSerialDao.save(lendSerial);
+            return lendSerialDao.save(lendSerial);
         }
         return 0;
     }

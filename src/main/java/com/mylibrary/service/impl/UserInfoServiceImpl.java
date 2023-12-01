@@ -54,7 +54,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
             loginDto.setUserName(userInfo.getName());
             loginDto.setRole(userInfo.getRole());
         }else{
-            loginDto.setCode(-1);
+            loginDto.setCode(-2);
             loginDto.setErrorMsg("Ops this is an Error");
         }
 

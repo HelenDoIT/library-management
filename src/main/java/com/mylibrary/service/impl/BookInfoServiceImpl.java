@@ -61,21 +61,12 @@ public class BookInfoServiceImpl implements IBookInfoService {
 
     @Override
     public List<BookInfo> listAll() {
-        try {
-            return bookInfoDao.listAll();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return bookInfoDao.listAll();
     }
 
     @Override
     public BookInfo queryByName(String bookname) {
-        try {
-            return bookInfoDao.queryByName(bookname);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return bookInfoDao.queryByName(bookname);
+
     }
 }

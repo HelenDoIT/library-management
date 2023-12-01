@@ -21,11 +21,15 @@ public class UserInfo implements Serializable {
 
     }
 
-    public UserInfo(Long userId, String name, String password, String role) {
-        this.userId = userId;
+    public UserInfo(String name, String password, String role) {
         this.name = name;
         this.password = password;
         this.role = role;
+    }
+
+    public UserInfo(Long userId, String name, String password, String role) {
+        this(name,password,role);
+        this.userId = userId;
     }
 
     public Long getUserId() {

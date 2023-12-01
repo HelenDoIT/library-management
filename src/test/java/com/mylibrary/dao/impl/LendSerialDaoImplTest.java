@@ -1,12 +1,15 @@
 package com.mylibrary.dao.impl;
 
 import com.mylibrary.domain.LendSerial;
+import com.mylibrary.util.JdbcTemplate;
+import com.mylibrary.util.PropertiesUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class LendSerialDaoImplTest {
 
-    @Mock
-    private LendSerialDaoImpl lendSerialDaoMock;
+    private boolean callRealFlag = PropertiesUtil.daoRealCallMock;
+
     @Spy
     private LendSerialDaoImpl lendSerialDao;
     @Captor
@@ -33,12 +36,17 @@ class LendSerialDaoImplTest {
     @Test
     void save() {
         LendSerial lendSerial = new LendSerial(null,1L,22L,1,0,null,null);
-        //Below will real call database
-        Mockito.when(lendSerialDao.save(lendSerial)).thenReturn(1);
-        Assertions.assertEquals(1,lendSerialDao.save(lendSerial));
+        if(callRealFlag){
+            //Below will real call database
+            Assertions.assertEquals(1,lendSerialDao.save(lendSerial));
+        }
 
-        Mockito.when(lendSerialDaoMock.save(lendSerial)).thenReturn(1);
-        Assertions.assertEquals(1,lendSerialDaoMock.save(lendSerial));
+        try (MockedStatic<JdbcTemplate> jdbcTemplateMock = Mockito.mockStatic(JdbcTemplate.class)) {
+            jdbcTemplateMock.when(() -> JdbcTemplate.update(ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any(),
+                    ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any()))
+                    .thenReturn(1);
+            Assertions.assertEquals(1,lendSerialDao.save(lendSerial));
+        }
     }
 
     @Test
@@ -47,34 +55,55 @@ class LendSerialDaoImplTest {
         lendSerial.setSerialNo(1L);
         lendSerial.setLendStatus(1);
 
-//        Mockito.when(lendSerialDao.updateLendStatus(lendSerial.getSerialNo(),lendSerial.getLendStatus())).thenReturn(1);
-//        Assertions.assertEquals(1,lendSerialDao.updateLendStatus(lendSerial.getSerialNo(),lendSerial.getLendStatus()));
+        if(callRealFlag){
+            assertDoesNotThrow(() -> lendSerialDao.updateLendStatus(1L, 1));
+        }
 
-        Mockito.when(lendSerialDaoMock.updateLendStatus(lendSerial.getSerialNo(),lendSerial.getLendStatus())).thenReturn(1);
-        Assertions.assertEquals(1,lendSerialDaoMock.updateLendStatus(lendSerial.getSerialNo(),lendSerial.getLendStatus()));
-
-    }
-
-    @Test
-    void queryOne() {
+        try (MockedStatic<JdbcTemplate> jdbcTemplateMock = Mockito.mockStatic(JdbcTemplate.class)) {
+            jdbcTemplateMock.when(() -> JdbcTemplate.update(ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.anyLong()))
+                    .thenReturn(1);
+            int i = lendSerialDao.updateLendStatus(1L, 1);
+            Assertions.assertEquals(1,i);
+        }
     }
 
     @Test
     void queryByUserId() {
+
+        if(callRealFlag){
+            List<LendSerial> lendSerialList = lendSerialDao.queryByUserId(1L);
+            if(null != lendSerialList && lendSerialList.size() > 0 ){
+                Assertions.assertEquals(1L,lendSerialDao.queryByUserId(1L).get(0).getUserId());
+            }
+        }
+
         List<LendSerial> lendSerialList = new ArrayList<>();
         lendSerialList.add(new LendSerial(null,1L,22L,1,0,null,null));
-        Mockito.when(lendSerialDao.queryByUserId(1L)).thenReturn(lendSerialList);
-        Assertions.assertEquals(22L,lendSerialDao.queryByUserId(1L).get(0).getBookId());
+        try (MockedStatic<JdbcTemplate> jdbcTemplateMock = Mockito.mockStatic(JdbcTemplate.class)) {
+            jdbcTemplateMock.when(() -> JdbcTemplate.queryList(ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.anyLong()))
+                    .thenReturn(lendSerialList);
+            List<LendSerial> lendSerialList1 = lendSerialDao.queryByUserId(1L);
+            Assertions.assertEquals(22L,lendSerialList1.get(0).getBookId());
+        }
 
-        Mockito.when(lendSerialDaoMock.queryByUserId(1L)).thenReturn(lendSerialList);
-        Assertions.assertEquals(22L,lendSerialDaoMock.queryByUserId(1L).get(0).getBookId());
     }
 
     @Test
     void queryByBookIdAndStatus() {
+        if(callRealFlag){
+            List<LendSerial> lendSerialList = lendSerialDao.queryByBookIdAndStatus(1L,0);
+            if(null != lendSerialList && lendSerialList.size() > 0 ){
+                Assertions.assertEquals(1L,lendSerialDao.queryByUserId(1L).get(0).getBookId());
+            }
+        }
+
         List<LendSerial> lendSerialList = new ArrayList<>();
         lendSerialList.add(new LendSerial(null,1L,22L,1,0,null,null));
-        Mockito.when(lendSerialDao.queryByBookIdAndStatus(1L,0)).thenReturn(lendSerialList);
-        Assertions.assertEquals(22L,lendSerialDao.queryByBookIdAndStatus(1L,0).get(0).getBookId());
+        try (MockedStatic<JdbcTemplate> jdbcTemplateMock = Mockito.mockStatic(JdbcTemplate.class)) {
+            jdbcTemplateMock.when(() -> JdbcTemplate.queryList(ArgumentMatchers.any(),ArgumentMatchers.any()
+                    ,ArgumentMatchers.anyLong(),ArgumentMatchers.anyInt()))
+                    .thenReturn(lendSerialList);
+            Assertions.assertEquals(22L,lendSerialDao.queryByBookIdAndStatus(1L,0).get(0).getBookId());
+        }
     }
 }

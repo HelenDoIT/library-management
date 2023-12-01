@@ -12,10 +12,6 @@ public interface IUserInfoDao {
 
     public int save(UserInfo userInfo);
 
-    public int updateByKey(Long id,UserInfo userInfo);
-
-    public UserInfo queryByKey(Long id);
-
     public UserInfo queryByName(String username);
 
 }
